@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  FunctionName:
+    Type: String
+
+  AlartActionTopicArn:
+    Type: String
+
+  LambdaLogGroupNamePrefix:
+    Type: String
+    Default: /aws/lambda
+
+  FilterPattern:
+    Type: String
+    Default: "?\"\\\"levelname\\\": \\\"ERROR\\\"\""
+
+  MetricNamespace:
+    Type: String
+    Default: ErrorLogMetrics
+
+Resources:
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub ${LambdaLogGroupNamePrefix}/${FunctionName}
+      RetentionInDays: 14
+
+  MetricFilter:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      FilterPattern: !Ref FilterPattern
+      LogGroupName: !Ref LogGroup
+      MetricTransformations:
+        - MetricName: !Ref FunctionName
+          MetricNamespace: !Ref MetricNamespace
+          MetricValue: "1"
+
+  Alarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub ErrorAlarm-${FunctionName}
+      AlarmActions:
+        - !Ref AlartActionTopicArn
+      ActionsEnabled: true
+      MetricName: !Ref FunctionName
+      Namespace: !Ref MetricNamespace
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1.0
+      ComparisonOperator: GreaterThanOrEqualToThreshold

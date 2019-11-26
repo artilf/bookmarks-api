@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
+  BookmarksChatBotSnsTopicArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: BookmarksChatBotSnsTopicArn
+
   BookmarksToolsLayerArn:
     Type: AWS::SSM::Parameter::Value<String>
     Default: BookmarksToolsLayerArn
@@ -9,6 +13,29 @@ Parameters:
   KmsKeyId:
     Type: AWS::SSM::Parameter::Value<String>
     Default: KmsKeyId
+
+  Environ:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: Environ
+
+  StageName:
+    Type: String
+    Default: v1
+
+Globals:
+  Function:
+    Runtime: python3.7
+    Timeout: 30
+    MemorySize: 256
+    AutoPublishAlias: !Ref Environ
+    Environment:
+      Variables:
+        AWS_ENV: !Ref Environ
+        ARTICLES_TABLE_NAME: !Ref ArticlesTable
+        KMS_KEY_ID: !Ref KmsKeyId
+        USER_ID: C345859B-0C0F-45FA-AFF9-C480E34F0F36
+    Layers:
+      - !Ref BookmarksToolsLayerArn
 
 Resources:
   ArticlesTable:
@@ -25,3 +52,35 @@ Resources:
           KeyType: HASH
         - AttributeName: createdAt
           KeyType: RANGE
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref StageName
+
+  CreateEncryptedConfigFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/create_encrypted_config
+      Handler: index.handler
+      Events:
+        PostConfig:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /config/encrypt
+            Method: POST
+
+  CreateEncryptedConfigLogResources:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: log_resources.yml
+      Parameters:
+        FunctionName: !Ref CreateEncryptedConfigFunction
+        AlartActionTopicArn: !Ref BookmarksChatBotSnsTopicArn
+
+Outputs:
+  ApiBaseUrl:
+    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/${StageName}
+  CreateEncryptedConfigUrl:
+    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/config/encrypt
