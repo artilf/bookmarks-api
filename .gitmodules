@@ -1,0 +1,4 @@
+[submodule "submodules/bookmarks-layer"]
+	path = submodules/bookmarks-layer
+	url = https://github.com/artilf/bookmarks-layer.git
+	branch = master
