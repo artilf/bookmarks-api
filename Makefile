@@ -29,6 +29,7 @@ deploy: package
 		--template-file dist/template.yml \
 		--stack-name $(stack_name) \
 		--capabilities CAPABILITY_IAM \
+		--role-arn $(AWS_CFN_DEPLOY_ROLE_ARN) \
 		--no-fail-on-empty-changeset
 
 test-unit:
