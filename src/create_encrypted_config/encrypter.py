@@ -1,4 +1,3 @@
-import gzip
 import json
 from base64 import urlsafe_b64encode
 from typing import Optional
@@ -67,5 +66,5 @@ def encrypt_config(config: PostedConfig, kms_client: BaseClient) -> str:
 
     resp = kms_client.encrypt(**option)
 
-    encoded = urlsafe_b64encode(gzip.compress(resp["CiphertextBlob"]))
+    encoded = urlsafe_b64encode(resp["CiphertextBlob"])
     return encoded.decode()
