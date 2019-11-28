@@ -33,7 +33,7 @@ Globals:
         AWS_ENV: !Ref Environ
         ARTICLES_TABLE_NAME: !Ref ArticlesTable
         KMS_KEY_ID: !Ref KmsKeyId
-        USER_ID: C345859B-0C0F-45FA-AFF9-C480E34F0F36
+        BOOKMARKS_USER_ID: C345859B-0C0F-45FA-AFF9-C480E34F0F36
     Layers:
       - !Ref BookmarksToolsLayerArn
 
@@ -63,6 +63,9 @@ Resources:
     Properties:
       CodeUri: src/create_encrypted_config
       Handler: index.handler
+      Policies:
+        - arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
       Events:
         PostConfig:
           Type: Api

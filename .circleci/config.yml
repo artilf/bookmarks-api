@@ -1,0 +1,101 @@
+version: 2
+
+references:
+  primary_containers: &primary_containers
+    docker:
+      - image: circleci/python:3.7.5
+
+  test_containers: &test_containers
+    docker:
+      - image: circleci/python:3.7.5
+      - image: localstack/localstack:0.9.1
+        environment:
+          SERVICES: s3,sns
+
+  install_dependencies: &install_dependencies
+    run:
+      name: Install Dependencies
+      command: |
+        if [[ ! -d .venv ]]; then
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install pipenv
+          pipenv install --dev
+        fi
+
+  save_dependencies: &save_dependencies
+    save_cache:
+      paths:
+        - .venv
+      key: dependencies-{{ .Branch }}-{{ checksum "Pipfile" }}-{{ checksum "Pipfile.lock" }}
+  restore_dependencies: &restore_dependencies
+    restore_cache:
+      keys:
+        - dependencies-{{ .Branch }}-{{ checksum "Pipfile" }}-{{ checksum "Pipfile.lock" }}
+
+  notify_start_to_slack: &notify_start_to_slack
+    run:
+      name: Notify Start to Slack
+      command: ./notify.sh -s
+
+  notify_success_to_slack: &notify_success_to_slack
+    run:
+      name: Notify Success to Slack
+      command: ./notify.sh -e
+
+  notify_failed_to_slack: &notify_failed_to_slack
+    run:
+      name: Notify Failed to Slack
+      command: ./notify.sh -f
+      when: on_fail
+
+jobs:
+  test_unit:
+    <<: *test_containers
+    steps:
+      - checkout
+      - <<: *notify_start_to_slack
+      - run:
+          name: Get Submodule
+          command: |
+            git submodule init
+            git submodule update
+      - <<: *restore_dependencies
+      - <<: *install_dependencies
+      - <<: *save_dependencies
+      - run:
+          name: Lint & Test Unit
+          command: |
+            make lint test-unit
+      - <<: *notify_success_to_slack
+      - <<: *notify_failed_to_slack
+
+  deploy_production:
+    <<: *primary_containers
+    steps:
+      - checkout
+      - <<: *notify_start_to_slack
+      - <<: *restore_dependencies
+      - <<: *install_dependencies
+      - <<: *save_dependencies
+      - run:
+          name: deploy
+          command: |
+            eval "$(./guess.sh -e production -a)"
+            make deploy
+      - store_artifacts:
+          path: dist/template.yml
+      - <<: *notify_success_to_slack
+      - <<: *notify_failed_to_slack
+
+workflows:
+  version: 2
+  bookmarks-api:
+    jobs:
+      - test_unit
+      - deploy_production:
+          requires:
+            - test_unit
+          filters:
+            branches:
+              only: master

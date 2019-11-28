@@ -30,9 +30,6 @@ deploy: package
 		--stack-name $(stack_name) \
 		--capabilities CAPABILITY_IAM \
 		--no-fail-on-empty-changeset
-	pipenv run aws cloudformation describe-stacks \
-		--stack-name $(stack_name) \
-		--query 'Stacks[0].Outputs'
 
 test-unit:
 	@for test_dir in $$(find tests/unit -maxdepth 1 -type d); do \

@@ -13,6 +13,7 @@ isort = "*"
 pytest = "*"
 pytest-cov = "*"
 freezegun = "*"
+boto3 = "*"
 
 [packages]
 

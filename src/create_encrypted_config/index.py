@@ -1,21 +1,15 @@
-import json
-from decimal import Decimal
+from encrypter import main
+from logger.my_logger import MyLogger
+from tools.api_gw import create_response
+from tools.aws_tools import save_lambda_request_id
+
+logger = MyLogger(__name__)
 
 
+@save_lambda_request_id
 def handler(event, context):
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Content-Type': 'application/json'
-        },
-        'body': json.dumps(event, default=default)
-    }
-
-
-def default(obj):
-    if isinstance(obj, Decimal):
-        return int(obj) if int(obj) == obj else float(obj)
     try:
-        return str(obj)
-    except Exception:
-        return None
+        return main(event)
+    except Exception as e:
+        logger.error(f'Exception occurred: {e}')
+        return create_response(500, {'message': 'InternalServerError'})
