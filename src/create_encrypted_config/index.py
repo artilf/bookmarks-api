@@ -11,5 +11,5 @@ def handler(event, context):
     try:
         return main(event)
     except Exception as e:
-        logger.error(f'Exception occurred: {e}')
-        return create_response(500, {'message': 'InternalServerError'})
+        logger.error(f"Exception occurred: {e}")
+        return create_response(500, {"message": "InternalServerError"})
