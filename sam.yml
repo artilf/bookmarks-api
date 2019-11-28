@@ -38,10 +38,15 @@ Globals:
       - !Ref BookmarksToolsLayerArn
 
 Resources:
+  DummyIAMGroup:
+    Type: AWS::IAM::Group
+
   KmsDecryptPolicy:
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: KmsDecryptPolicy
+      Groups:
+        - !Ref DummyIAMGroup
       PolicyDocument:
         Version: 2012-10-17
         Statement:
