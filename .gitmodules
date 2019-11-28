@@ -1,4 +1,0 @@
-[submodule "submodules/bookmarks-layer"]
-	path = submodules/bookmarks-layer
-	url = ssh://github-private/artilf/bookmarks-layer
-	branch = master
