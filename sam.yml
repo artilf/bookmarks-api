@@ -38,6 +38,20 @@ Globals:
       - !Ref BookmarksToolsLayerArn
 
 Resources:
+  KmsDecryptPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: KmsDecryptPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - kms:Decrypt
+            Resource:
+              - !Ref KmsKeyId
+
+
   ArticlesTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -64,8 +78,8 @@ Resources:
       CodeUri: src/create_encrypted_config
       Handler: index.handler
       Policies:
-        - arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser
         - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/${KmsDecryptPolicy}
       Events:
         PostConfig:
           Type: Api
