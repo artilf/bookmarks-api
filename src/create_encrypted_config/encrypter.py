@@ -1,6 +1,5 @@
 import json
 from base64 import urlsafe_b64encode
-from lzma import compress
 from typing import Optional
 
 from botocore.client import BaseClient
@@ -63,7 +62,7 @@ def get_config(tags) -> PostedConfig:
 
 def encrypt_config(config: PostedConfig, kms_client: BaseClient) -> str:
     data = config.to_json()
-    option = {"KeyId": get_kms_key_id(), "Plaintext": compress(data.encode())}
+    option = {"KeyId": get_kms_key_id(), "Plaintext": data.encode()}
 
     resp = kms_client.encrypt(**option)
 
