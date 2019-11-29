@@ -6,7 +6,7 @@ from tools.aws_tools import save_lambda_request_id
 logger = MyLogger(__name__)
 
 
-@save_lambda_request_id
+@save_lambda_request_id()
 def handler(event, context):
     try:
         return main(event)

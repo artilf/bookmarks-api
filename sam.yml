@@ -31,8 +31,6 @@ Globals:
     Environment:
       Variables:
         AWS_ENV: !Ref Environ
-        ARTICLES_TABLE_NAME: !Ref ArticlesTable
-        KMS_KEY_ID: !Ref KmsKeyId
         BOOKMARKS_USER_ID: C345859B-0C0F-45FA-AFF9-C480E34F0F36
     Layers:
       - !Ref BookmarksToolsLayerArn
@@ -73,6 +71,9 @@ Resources:
                 - kms:Encrypt
               Resource:
                 - "*"
+      Environment:
+        Variables:
+          KMS_KEY_ID: !Ref KmsKeyId
       Events:
         PostConfig:
           Type: Api

@@ -37,5 +37,5 @@ test-unit:
 		handler=$$(basename $$test_dir); \
 		if [[ $$handler =~ unit|__pycache__ ]]; then continue; fi; \
 		PYTHONPATH=src/layer/python \
-		pipenv run pytest $$test_dir --cov-config=setup.cfg --cov=src/layer/python/$$handler; \
+		pipenv run pytest $$test_dir --cov-config=setup.cfg --cov=src/$$handler; \
 	done
