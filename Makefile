@@ -11,7 +11,7 @@ lint:
 		src/ \
 		tests/
 
-format:
+black:
 	pipenv run black \
 		src/ \
 		tests/
