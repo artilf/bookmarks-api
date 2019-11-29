@@ -1,3 +1,4 @@
+import gzip
 import json
 from base64 import urlsafe_b64encode
 from typing import Optional
@@ -62,7 +63,7 @@ def get_config(tags) -> PostedConfig:
 
 def encrypt_config(config: PostedConfig, kms_client: BaseClient) -> str:
     data = config.to_json()
-    option = {"KeyId": get_kms_key_id(), "Plaintext": data.encode()}
+    option = {"KeyId": get_kms_key_id(), "Plaintext": gzip.compress(data.encode())}
 
     resp = kms_client.encrypt(**option)
 
