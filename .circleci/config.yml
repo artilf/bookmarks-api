@@ -51,7 +51,7 @@ references:
 
 jobs:
   test_unit:
-    <<: *test_containers
+    <<: *primary_containers
     steps:
       - checkout
       - <<: *notify_start_to_slack
