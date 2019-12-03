@@ -51,7 +51,7 @@ def main(
         )
 
     put_article(article, config, dynamodb_resource)
-    return create_success_response(article)
+    return create_success_response(raw_encoded_article)
 
 
 def parse_article(encoded_article: str):
