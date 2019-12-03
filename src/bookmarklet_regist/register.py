@@ -9,13 +9,12 @@ from logger.my_logger import MyLogger
 from models.article import Article
 from models.posted_config import PostedConfig
 from tools.auth import can_access
-from tools.aws_tools import get_dynamodb_resource, get_kms_client, get_ssm_client
-from tools.bookmarklet_tools import (
-    create_failed_response,
-    create_success_response,
-    get_raw_encoded_article,
-    get_raw_encoded_config,
-)
+from tools.aws_tools import (get_dynamodb_resource, get_kms_client,
+                             get_ssm_client)
+from tools.bookmarklet_tools import (create_failed_response,
+                                     create_success_response,
+                                     get_raw_encoded_article,
+                                     get_raw_encoded_config)
 from tools.environment_values import get_articles_table_name, get_user_id
 
 logger = MyLogger(__name__)
