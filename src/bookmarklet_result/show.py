@@ -33,7 +33,7 @@ def get_article(event) -> Optional[Article]:
     if raw_encoded_article is None:
         return None
     try:
-        text = urlsafe_decode(raw_encoded_article)
+        text = urlsafe_decode(raw_encoded_article).decode()
         return Article.loads(text)
     except Exception as e:
         logger.warning(f"Exception occurred: {e}")
@@ -44,7 +44,7 @@ def get_message(event) -> str:
     raw_encoded_message = get_raw_encoded_message(event)
     if raw_encoded_message is None:
         return str(None)
-    return urlsafe_decode(raw_encoded_message)
+    return urlsafe_decode(raw_encoded_message).decode()
 
 
 def create_html_until_head(title: str, redirect_url: Optional[str] = None) -> List[str]:

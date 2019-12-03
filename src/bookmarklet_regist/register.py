@@ -56,7 +56,7 @@ def main(
 
 def parse_article(encoded_article: str):
     try:
-        raw_article = urlsafe_decode(encoded_article)
+        raw_article = urlsafe_decode(encoded_article).decode()
         return Article.loads(raw_article)
     except Exception as e:
         logger.warning(f"Exception occurred: {e}")
@@ -68,7 +68,7 @@ def parse_config(
 ) -> Optional[PostedConfig]:
     if encoded_config is None:
         return None
-    option = {"CiphertextBlob": urlsafe_decode(encoded_config).encode()}
+    option = {"CiphertextBlob": urlsafe_decode(encoded_config)}
     resp = kms_client.decrypt(**option)
     raw_config = resp["Plaintext"].decode()
     try:

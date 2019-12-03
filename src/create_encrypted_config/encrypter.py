@@ -65,5 +65,5 @@ def encrypt_config(config: PostedConfig, kms_client: BaseClient) -> str:
 
     resp = kms_client.encrypt(**option)
 
-    encoded = urlsafe_encode(resp["CiphertextBlob"].decode())
+    encoded = urlsafe_encode(resp["CiphertextBlob"])
     return encoded
