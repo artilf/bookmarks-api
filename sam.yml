@@ -153,6 +153,16 @@ Resources:
     Properties:
       CodeUri: src/tweet
       Handler: index.handler
+      Policies:
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - Version: 2012-10-17
+          Statement:
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - kms:Encrypt
+              Resource:
+                - "*"
       Layers:
         - !Ref TwitterLayerArn
       Events:
