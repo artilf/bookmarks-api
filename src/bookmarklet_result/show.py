@@ -1,10 +1,13 @@
-from base64 import urlsafe_b64decode
 from typing import List, Optional
 
 from logger.my_logger import MyLogger
 from models.article import Article
-from tools.bookmarklet_tools import (get_raw_encoded_article,
-                                     get_raw_encoded_message, is_success)
+from tools.base64 import urlsafe_decode
+from tools.bookmarklet_tools import (
+    get_raw_encoded_article,
+    get_raw_encoded_message,
+    is_success,
+)
 
 logger = MyLogger(__name__)
 SECOND = 5
@@ -30,7 +33,7 @@ def get_article(event) -> Optional[Article]:
     if raw_encoded_article is None:
         return None
     try:
-        text = urlsafe_b64decode(raw_encoded_article.encode()).decode()
+        text = urlsafe_decode(raw_encoded_article)
         return Article.loads(text)
     except Exception as e:
         logger.warning(f"Exception occurred: {e}")
@@ -41,7 +44,7 @@ def get_message(event) -> str:
     raw_encoded_message = get_raw_encoded_message(event)
     if raw_encoded_message is None:
         return str(None)
-    return urlsafe_b64decode(raw_encoded_message.encode()).decode()
+    return urlsafe_decode(raw_encoded_message)
 
 
 def create_html_until_head(title: str, redirect_url: Optional[str] = None) -> List[str]:

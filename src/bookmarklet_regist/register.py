@@ -1,4 +1,3 @@
-from base64 import urlsafe_b64decode
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -9,12 +8,14 @@ from logger.my_logger import MyLogger
 from models.article import Article
 from models.posted_config import PostedConfig
 from tools.auth import can_access
-from tools.aws_tools import (get_dynamodb_resource, get_kms_client,
-                             get_ssm_client)
-from tools.bookmarklet_tools import (create_failed_response,
-                                     create_success_response,
-                                     get_raw_encoded_article,
-                                     get_raw_encoded_config)
+from tools.aws_tools import get_dynamodb_resource, get_kms_client, get_ssm_client
+from tools.base64 import urlsafe_decode
+from tools.bookmarklet_tools import (
+    create_failed_response,
+    create_success_response,
+    get_raw_encoded_article,
+    get_raw_encoded_config,
+)
 from tools.environment_values import get_articles_table_name, get_user_id
 
 logger = MyLogger(__name__)
@@ -55,7 +56,7 @@ def main(
 
 def parse_article(encoded_article: str):
     try:
-        raw_article = urlsafe_b64decode(encoded_article.encode()).decode()
+        raw_article = urlsafe_decode(encoded_article)
         return Article.loads(raw_article)
     except Exception as e:
         logger.warning(f"Exception occurred: {e}")
@@ -67,7 +68,7 @@ def parse_config(
 ) -> Optional[PostedConfig]:
     if encoded_config is None:
         return None
-    option = {"CiphertextBlob": urlsafe_b64decode(encoded_config.encode())}
+    option = {"CiphertextBlob": urlsafe_decode(encoded_config).encode()}
     resp = kms_client.decrypt(**option)
     raw_config = resp["Plaintext"].decode()
     try:

@@ -1,5 +1,4 @@
 import json
-from base64 import urlsafe_b64encode
 from typing import Optional
 
 from botocore.client import BaseClient
@@ -9,6 +8,7 @@ from models.posted_config import PostedConfig
 from tools.api_gw import create_response
 from tools.auth import can_access
 from tools.aws_tools import get_kms_client, get_ssm_client
+from tools.base64 import urlsafe_encode
 from tools.environment_values import get_kms_key_id
 
 logger = MyLogger(__name__)
@@ -65,5 +65,5 @@ def encrypt_config(config: PostedConfig, kms_client: BaseClient) -> str:
 
     resp = kms_client.encrypt(**option)
 
-    encoded = urlsafe_b64encode(resp["CiphertextBlob"])
-    return encoded.decode()
+    encoded = urlsafe_encode(resp["CiphertextBlob"].decode())
+    return encoded
