@@ -23,7 +23,6 @@ def main(
     arg_ssm_client: Optional[BaseClient] = None,
     arg_kms_client: Optional[BaseClient] = None,
 ):
-    logger.info("event", event=event)
     ssm_client: BaseClient = get_ssm_client() if arg_ssm_client is None else arg_ssm_client
     kms_client: BaseClient = get_kms_client() if arg_kms_client is None else arg_kms_client
     if not can_access(event, ssm_client, is_header=True):

@@ -36,6 +36,6 @@ test-unit:
 	@for test_dir in $$(find tests/unit -maxdepth 1 -type d); do \
 		handler=$$(basename $$test_dir); \
 		if [[ $$handler =~ unit|__pycache__ ]]; then continue; fi; \
-		PYTHONPATH=src/layer/python \
+		PYTHONPATH=submodules/bookmarks-layer/src/layer/python:src/$$handler \
 		pipenv run pytest $$test_dir --cov-config=setup.cfg --cov=src/$$handler; \
 	done
