@@ -10,6 +10,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: BookmarksToolsLayerArn
 
+  TwitterLayerArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: TwitterLayerArn
+
   KmsKeyId:
     Type: AWS::SSM::Parameter::Value<String>
     Default: KmsKeyId
@@ -52,6 +56,8 @@ Resources:
           KeyType: HASH
         - AttributeName: createdAt
           KeyType: RANGE
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
 
   Api:
     Type: AWS::Serverless::Api
@@ -141,6 +147,20 @@ Resources:
       Parameters:
         FunctionName: !Ref BookmarkletResultFunction
         AlartActionTopicArn: !Ref BookmarksChatBotSnsTopicArn
+
+  TweetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/tweet
+      Handler: index.handler
+      Layers:
+        - !Ref TwitterLayerArn
+      Events:
+        Insert:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt ArticlesTable.StreamArn
+            StartingPosition: LATEST
 
 
 Outputs:
