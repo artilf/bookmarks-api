@@ -1,7 +1,6 @@
 from logger.my_logger import MyLogger
-from tools.aws_tools import save_lambda_request_id
-
 from show import main
+from tools.aws_tools import save_lambda_request_id
 
 logger = MyLogger(__name__)
 
