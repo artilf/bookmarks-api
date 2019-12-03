@@ -161,6 +161,7 @@ Resources:
           Properties:
             Stream: !GetAtt ArticlesTable.StreamArn
             StartingPosition: LATEST
+            BatchSize: 1
 
 
 Outputs:
