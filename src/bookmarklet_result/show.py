@@ -25,7 +25,7 @@ def main(event):
 
 
 def create_response(page: str):
-    return {"status_code": 200, "headers": {"Content-Type": "plain/html"}, "body": page}
+    return {"statusCode": 200, "headers": {"Content-Type": "text/html"}, "body": page}
 
 
 def get_article(event) -> Optional[Article]:

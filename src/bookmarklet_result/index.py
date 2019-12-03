@@ -13,7 +13,7 @@ def handler(event, context):
         logger.error(f"Exception occurred: {e}")
         return {
             "statusCode": 500,
-            "header": {"Content-Type": "plain/html"},
+            "header": {"Content-Type": "text/html"},
             "body": create_failed_process_page(),
         }
 
