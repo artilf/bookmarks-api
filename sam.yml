@@ -22,6 +22,14 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: Environ
 
+  ArticlesTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: ArticlesTableName
+
+  ArticlesTableStreamArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: ArticlesTableStreamArn
+
   StageName:
     Type: String
     Default: v1
@@ -37,28 +45,11 @@ Globals:
         AWS_ENV: !Ref Environ
         BOOKMARKS_USER_ID: C345859B-0C0F-45FA-AFF9-C480E34F0F36
         KMS_KEY_ID: !Ref KmsKeyId
-        ARTICLES_TABLE_NAME: !Ref ArticlesTable
+        ARTICLES_TABLE_NAME: !Ref ArticlesTableName
     Layers:
       - !Ref BookmarksToolsLayerArn
 
 Resources:
-  ArticlesTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: userId
-          AttributeType: S
-        - AttributeName: createdAt
-          AttributeType: N
-      KeySchema:
-        - AttributeName: userId
-          KeyType: HASH
-        - AttributeName: createdAt
-          KeyType: RANGE
-      StreamSpecification:
-        StreamViewType: NEW_IMAGE
-
   Api:
     Type: AWS::Serverless::Api
     Properties:
@@ -169,7 +160,7 @@ Resources:
         Insert:
           Type: DynamoDB
           Properties:
-            Stream: !GetAtt ArticlesTable.StreamArn
+            Stream: !Ref ArticlesTableStreamArn
             StartingPosition: LATEST
             BatchSize: 1
 
