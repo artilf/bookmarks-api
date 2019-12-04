@@ -16,6 +16,8 @@ black:
 		src/ \
 		tests/
 
+format: isort black lint
+
 package:
 	rm -rf dist
 	mkdir dist

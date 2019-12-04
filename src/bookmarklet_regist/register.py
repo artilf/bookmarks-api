@@ -8,7 +8,7 @@ from logger.my_logger import MyLogger
 from models.article import Article
 from models.posted_config import PostedConfig
 from tools.auth import can_access
-from tools.aws_tools import get_dynamodb_resource, get_kms_client, get_ssm_client
+from tools.aws_tools import get_dynamodb_resource, get_ssm_client
 from tools.base64 import urlsafe_decode
 from tools.bookmarklet_tools import (
     create_failed_response,
@@ -28,11 +28,9 @@ class BadRequestError(Exception):
 def main(
     event,
     arg_ssm_client: Optional[BaseClient] = None,
-    arg_kms_client: Optional[BaseClient] = None,
     arg_dynamodb_resource: Optional[ServiceResource] = None,
 ):
     ssm_client: BaseClient = get_ssm_client() if arg_ssm_client is None else arg_ssm_client
-    kms_client: BaseClient = get_kms_client() if arg_kms_client is None else arg_kms_client
     dynamodb_resource: ServiceResource = get_dynamodb_resource() if arg_dynamodb_resource is None else arg_dynamodb_resource
 
     if not can_access(event, ssm_client):
@@ -43,7 +41,7 @@ def main(
 
     try:
         article = parse_article(raw_encoded_article)
-        config = parse_config(raw_encoded_config, kms_client)
+        config = parse_config(raw_encoded_config)
     except BadRequestError as e:
         logger.warning(f"Exception occurred: {e}")
         return create_failed_response(
@@ -63,16 +61,12 @@ def parse_article(encoded_article: str):
         raise BadRequestError(str(e))
 
 
-def parse_config(
-    encoded_config: Optional[str], kms_client: BaseClient
-) -> Optional[PostedConfig]:
+def parse_config(encoded_config: Optional[str]) -> Optional[PostedConfig]:
     if encoded_config is None:
         return None
-    option = {"CiphertextBlob": urlsafe_decode(encoded_config)}
-    resp = kms_client.decrypt(**option)
-    raw_config = resp["Plaintext"].decode()
     try:
-        return PostedConfig(raw_config)
+        raw_config = urlsafe_decode(encoded_config).decode()
+        return PostedConfig.loads(raw_config)
     except Exception as e:
         logger.warning(f"Exception occurred: {e}")
         raise BadRequestError(str(e))
