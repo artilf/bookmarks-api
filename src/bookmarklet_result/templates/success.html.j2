@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja-jp">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+{% if article %}
+  <meta http-equiv="refresh" content="15;URL={{ article.url }}">
+{% endif %}
+  <title>Success Regist Article</title>
+</head>
+<body>
+  <h2>Success Regist Article</h2>
+{% if article %}
+  <p>15秒後にリダイレクトします。</p>
+{% endif %}
+  <hr />
+{% if article %}
+  <div>
+    <p>URL: <a href="{{ article.url }}" target="_blank">{{ article.url }}</a></p>
+    <p>Title: <a href="{{ article.url }}" target="_blank">{{ article.title }}</a></p>
+  </div>
+  <hr />
+{% endif %}
+</body>
+</html>

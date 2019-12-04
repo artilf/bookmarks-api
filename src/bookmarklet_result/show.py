@@ -88,6 +88,12 @@ def get_failed_template():
     return open(str(path)).read()
 
 
+def get_success_template():
+    rel_path = "templates/success.html.j2"
+    path = Path(__file__).parent.joinpath(rel_path).resolve()
+    return open(str(path)).read()
+
+
 def create_error_page(message: str, article: Optional[Article]) -> str:
     template = Template(get_failed_template())
     return template.render(message=message, article=article)
