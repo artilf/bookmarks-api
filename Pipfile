@@ -16,6 +16,7 @@ freezegun = "*"
 boto3 = "*"
 requests = "*"
 requests-oauthlib = "*"
+jinja2 = "*"
 
 [packages]
 

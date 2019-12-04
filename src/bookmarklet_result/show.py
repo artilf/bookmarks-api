@@ -1,4 +1,7 @@
+from pathlib import Path
 from typing import List, Optional
+
+from jinja2 import Template
 
 from logger.my_logger import MyLogger
 from models.article import Article
@@ -79,24 +82,15 @@ def create_article_block(article: Article) -> List[str]:
     ]
 
 
+def get_failed_template():
+    rel_path = "templates/failed.html.j2"
+    path = Path(__file__).parent.joinpath(rel_path).resolve()
+    return open(str(path)).read()
+
+
 def create_error_page(message: str, article: Optional[Article]) -> str:
-    until_head = create_html_until_head("Failed Regist Article")
-    first_half_body = [
-        "<body>",
-        "  <h2>Failed Regist Article</h2>",
-    ]
-    article_block = create_article_block(article) if article is not None else []
-    second_half_body = [
-        "  <hr />",
-        "  <div>",
-        "    <h3>Error Message</h3>",
-        f"    <pre>{message}</pre>",
-        "  </div>",
-        "</body>",
-    ]
-    return "\n".join(
-        until_head + first_half_body + article_block + second_half_body + ["</html>"]
-    )
+    template = Template(get_failed_template())
+    return template.render(message=message, article=article)
 
 
 def create_success_page(article: Optional[Article]) -> str:

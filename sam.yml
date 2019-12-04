@@ -14,6 +14,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: TwitterLayerArn
 
+  JinjaLayerArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: JinjaLayerArn
+
   KmsKeyId:
     Type: AWS::SSM::Parameter::Value<String>
     Default: KmsKeyId
@@ -123,6 +127,8 @@ Resources:
     Properties:
       CodeUri: src/bookmarklet_result
       Handler: index.handler
+      Layers:
+        - !Ref JinjaLayerArn
       Events:
         BookmarksRegistResult:
           Type: Api
