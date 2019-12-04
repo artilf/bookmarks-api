@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from jinja2 import Template
 
@@ -50,38 +50,6 @@ def get_message(event) -> str:
     return urlsafe_decode(raw_encoded_message).decode()
 
 
-def create_html_until_head(title: str, redirect_url: Optional[str] = None) -> List[str]:
-    fist_half = [
-        "<!DOCTYPE html>",
-        '<html lang="ja-jp">',
-        "<head>",
-        '  <meta charset="utf-8" />',
-        '  <meta name="viewport" content="width=device-width" />',
-        f"  <title>{title}</title>",
-    ]
-    second_half = [
-        "</head>",
-    ]
-    if redirect_url is None:
-        return fist_half + second_half
-    else:
-        return (
-            fist_half
-            + [f'<meta http-equiv="refresh" content="{SECOND};URL={redirect_url}">']
-            + second_half
-        )
-
-
-def create_article_block(article: Article) -> List[str]:
-    return [
-        f"  <hr />",
-        f"  <div>",
-        f'    <p>URL: <a href="{article.url}" target="_blank">{article.url}</a><p>',
-        f'    <p>Title: <a href="{article.url}" target="_blank">{article.title}</a><p>',
-        f"  </div>",
-    ]
-
-
 def get_failed_template():
     rel_path = "templates/failed.html.j2"
     path = Path(__file__).parent.joinpath(rel_path).resolve()
@@ -100,12 +68,5 @@ def create_error_page(message: str, article: Optional[Article]) -> str:
 
 
 def create_success_page(article: Optional[Article]) -> str:
-    url = article.url if article is not None else None
-    article_block = create_article_block(article) if article is not None else []
-    until_head = create_html_until_head("Success Regist Article", url)
-    first_half_body = [
-        "<body>",
-        "  <h2>Success Regist Article</h2>",
-    ]
-    seonc_half_body = ["</body>", "</html>"]
-    return "\n".join(until_head + first_half_body + article_block + seonc_half_body)
+    template = Template(get_success_template())
+    return template.render(article=article)
