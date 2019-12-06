@@ -62,7 +62,7 @@ def parse_article(encoded_article: str):
 
 
 def parse_config(encoded_config: Optional[str]) -> Optional[PostedConfig]:
-    if encoded_config is None:
+    if not encoded_config:
         return None
     try:
         raw_config = urlsafe_decode(encoded_config).decode()
