@@ -54,97 +54,6 @@ Globals:
       - !Ref BookmarksToolsLayerArn
 
 Resources:
-  Api:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: !Ref StageName
-
-  CreateEncryptedConfigFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/create_encrypted_config
-      Handler: index.handler
-      Policies:
-        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
-        - Version: 2012-10-17
-          Statement:
-            - Effect: Allow
-              Action:
-                - kms:Decrypt
-                - kms:Encrypt
-              Resource:
-                - "*"
-      Events:
-        PostConfig:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /config/encrypt
-            Method: POST
-
-  CreateEncryptedConfigLogResources:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: log_resources.yml
-      Parameters:
-        FunctionName: !Ref CreateEncryptedConfigFunction
-        AlartActionTopicArn: !Ref BookmarksChatBotSnsTopicArn
-
-  BookmarkletRegistFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/bookmarklet_regist
-      Handler: index.handler
-      Policies:
-        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
-        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
-        - Version: 2012-10-17
-          Statement:
-            - Effect: Allow
-              Action:
-                - kms:Decrypt
-                - kms:Encrypt
-              Resource:
-                - "*"
-      Events:
-        BookmarkletRegistArticle:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /bookmarklet/regist
-            Method: GET
-
-  BookmarkletRegistLogResource:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: log_resources.yml
-      Parameters:
-        FunctionName: !Ref BookmarkletRegistFunction
-        AlartActionTopicArn: !Ref BookmarksChatBotSnsTopicArn
-
-  BookmarkletResultFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/bookmarklet_result
-      Handler: index.handler
-      Layers:
-        - !Ref JinjaLayerArn
-      Events:
-        BookmarksRegistResult:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /bookmarklet/result
-            Method: GET
-
-  BookmarkletResultLogResource:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: log_resources.yml
-      Parameters:
-        FunctionName: !Ref BookmarkletResultFunction
-        AlartActionTopicArn: !Ref BookmarksChatBotSnsTopicArn
-
   TweetFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -170,11 +79,10 @@ Resources:
             StartingPosition: LATEST
             BatchSize: 1
 
-
-Outputs:
-  ApiBaseUrl:
-    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/${StageName}
-  CreateEncryptedConfigUrl:
-    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/config/encrypt
-  BookmarkletRegistUrl:
-    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/bookmarklet/regist
+  TweetLogResource:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: log_resources.yml
+      Parameters:
+        FunctionName: !Ref TweetFunction
+        AlartActionTopicArn: !Ref BookmarksChatBotSnsTopicArn

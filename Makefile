@@ -1,5 +1,5 @@
 SHELL = /usr/bin/env bash -xeuo pipefail
-stack_name=bookmarks-api
+stack_name=bookmarks-lambda
 
 isort:
 	pipenv run isort -rc \
